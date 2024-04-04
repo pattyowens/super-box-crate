@@ -1,7 +1,6 @@
 /*jshint esversion: 6 */
 // @ts-check
 
-let crate = 0;
 // A playable character
 /**
  * @typedef CrateProperties
@@ -15,7 +14,7 @@ export class Crate {
      * @param {CrateProperties} params
      */
     constructor(params = {}) {
-        
+
         // Create list of weapons
     }
 

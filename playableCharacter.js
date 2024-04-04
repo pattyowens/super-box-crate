@@ -1,7 +1,6 @@
 /*jshint esversion: 6 */
 // @ts-check
 
-let character = 0;
 // A playable character
 /**
  * @typedef PlayableCharacterProperties
