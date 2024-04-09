@@ -128,10 +128,43 @@ function drawAll() {
 function collectCrate() {
     for (let i = crates.length - 1; i >= 0; i--) {
         if (hero.x + hero.radius > crates[i].x && hero.x - hero.radius < crates[i].x + crates[i].length && hero.y + hero.radius > crates[i].y && hero.y - hero.radius < crates[i].y + crates[i].length) {
-            crates.splice(i);
+            crates.splice(i, 1);
             hero.randomGun();
             score++;
         }
+    }
+}
+
+function bulletCollision() {
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        // Left wall
+        if (bullets[i].x - bullets[i].radius < 20) {
+            bullets.splice(i, 1);
+            continue;
+        }
+        // Right wall
+        if (bullets[i].x + bullets[i].radius > canvas.width - 20) {
+            bullets.splice(i, 1);
+            continue;
+        }
+        // Invisible Ceiling
+        if (bullets[i].y - bullets[i].radius < 20) {
+            bullets.splice(i, 1);
+            continue;
+        }
+        // Invisible Floor
+        if (bullets[i].y + bullets[i].radius > canvas.height - 20) {
+            bullets.splice(i, 1);
+            continue;
+        }
+        let remove = false;
+        platforms.forEach(function (platform) {
+        // Check for collision of bullet and floor
+            if ((bullets[i].y + bullets[i].radius) > platform.y && (bullets[i].y - bullets[i].radius) < (platform.y + platform.height) && (bullets[i].x + bullets[i].radius) > platform.x && (bullets[i].x - bullets[i].radius) < (platform.x + platform.width)) {
+                remove = true;
+            }
+        });
+        if (remove) bullets.splice(i, 1);
     }
 }
 
@@ -172,6 +205,7 @@ function loop(timestamp) {
             bullets.forEach(function (bullet) {
                 bullet.update();
             })
+            bulletCollision();
         }
     }
     // Now we can render
