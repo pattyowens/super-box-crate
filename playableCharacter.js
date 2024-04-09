@@ -1,7 +1,16 @@
 /*jshint esversion: 6 */
 // @ts-check
 import { Platform } from "./boundaries.js";
-import { Crate } from "./crates.js";
+import { Bullet, Weapon } from "./weapons.js";
+
+
+// Create list of weapons
+let weaponsList = [
+    new Weapon("Pistol", 2),
+    new Weapon("Rifle", 4),
+    new Weapon("Automatic Rifle", 8), 
+    new Weapon("Minigun", 16)
+];
 
 // A playable character
 /**
@@ -22,12 +31,34 @@ export class PlayableCharacter {
         // Movement direction
         this.moveLeft = false;
         this.moveRight = false;
+        this.lastDirection = -1;
         this.moveDown = true;
         this.vy = 0;
         this.ay = 0.4;
 
         // Setup keyboard events
         this.setupKeyboardEvents();
+        this.weapon = weaponsList[0];
+    }
+
+    randomGun() {
+        this.weapon = weaponsList[Math.floor(Math.random() * weaponsList.length)];
+    }
+
+    /**
+     * Fire the weapon!
+     * @param {number} delta 
+     * @param {[Bullet]} bullets 
+     */
+    fireGun(delta, bullets) {
+        if (this.weapon.firing == true) {
+            if (this.weapon.timeDown == 0) bullets.push(new Bullet(this.x, this.y, 10 * this.lastDirection, this.vy));
+            if (this.weapon.timeDown > (1 / this.weapon.fireRate)) {
+                this.weapon.timeDown = 0;
+                bullets.push(new Bullet(this.x, this.y, 10 * this.lastDirection, this.vy));
+            }
+            this.weapon.timeDown += delta;
+        }
     }
 
     /**
@@ -38,9 +69,12 @@ export class PlayableCharacter {
             switch(event.key) {
                 case 'a': // Move left
                     this.moveLeft = true;
+                    this.lastDirection = -1;
                     break;
                 case 'd': // Move right
                     this.moveRight = true;
+                    this.lastDirection = 1;
+
                     break;
                 case 'w': // Move up
                     this.vy = -12;

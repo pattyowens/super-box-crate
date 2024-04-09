@@ -6,6 +6,7 @@ import { Wall } from "./boundaries.js";
 import { Crate } from "./crates.js";
 import { PlayableCharacter } from "./playableCharacter.js";
 import { TitleScreen } from "./titleScreen.js";
+import { Bullet } from "./weapons.js";
 
 
 /**
@@ -88,7 +89,7 @@ function drawScore() {
 }
 
 // Debugging board
-function drawBoard(){
+function drawBoard() {
     context?.save();
     let p = 0;
     for (var x = 0; x <= canvas.width; x += 40) {
@@ -105,14 +106,21 @@ function drawBoard(){
     context?.restore();
 }
 
+function drawBullets() {
+    bullets.forEach(function (bullet) {
+        bullet.draw(context);
+    })
+}
+
 /**
  * Wrapper for drawing all objects, establishes draw order
  */
 function drawAll() {
     drawMap();
     drawScore();
-    drawBoard();
+    //drawBoard();
     drawCrates();
+    drawBullets();
 
     hero.draw(context);
 }
@@ -121,6 +129,7 @@ function collectCrate() {
     for (let i = crates.length - 1; i >= 0; i--) {
         if (hero.x + hero.radius > crates[i].x && hero.x - hero.radius < crates[i].x + crates[i].length && hero.y + hero.radius > crates[i].y && hero.y - hero.radius < crates[i].y + crates[i].length) {
             crates.splice(i);
+            hero.randomGun();
             score++;
         }
     }
@@ -130,17 +139,21 @@ function collectCrate() {
 let title = /** @type {TitleScreen} */ new TitleScreen();
 
 let runGame = false;
-let lastTime; // undefined by default
+let lastTime;
 let crates = /** @type {Crate} */ [];
 crates.push(new Crate());
 let score = 0;
+
+let bullets = /** @type {Bullet} */ [];
 /**
  * Where we render the game
- * @param {*} timestamp 
+ * @param {number} timestamp 
  */
 function loop(timestamp) {
     // Time step 
-    const delta = (lastTime ? timestamp-lastTime : 0) * 1000.0/60.0;
+    if (lastTime === undefined) lastTime = 0;
+    const delta = (timestamp-lastTime) / 1000;
+    lastTime = timestamp;
     context?.clearRect(0, 0, width, height);
 
     if (!runGame && !title.visible) runGame = true;
@@ -149,12 +162,16 @@ function loop(timestamp) {
         if (crates.length == 0) {
             crates.push(new Crate());
         }
-        if (platforms !== undefined && crates !== undefined) {
+        if (platforms !== undefined && crates !== undefined && bullets !== undefined) {
             hero.update(canvas, platforms);
             crates.forEach(function (crate) {
                 crate.update(canvas, platforms);
             })
             collectCrate();
+            hero.fireGun(delta, bullets);
+            bullets.forEach(function (bullet) {
+                bullet.update();
+            })
         }
     }
     // Now we can render

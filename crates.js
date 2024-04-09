@@ -15,8 +15,6 @@ export class Crate {
         this.moveDown = true;
         this.vy = 0;
         this.ay = 0.3;
-
-        // Create list of weapons
     }
     /**
      * @param {CanvasRenderingContext2D} context 
