@@ -4,6 +4,7 @@
 import { Platform } from "./boundaries.js";
 import { Wall } from "./boundaries.js";
 import { PlayableCharacter } from "./playableCharacter.js";
+import { TitleScreen } from "./titleScreen.js";
 
 
 /**
@@ -63,16 +64,18 @@ function drawMap() {
     });
 }
 
-
 /**
  * Wrapper for drawing all objects, establishes draw order
  */
 function drawAll() {
-    context?.clearRect(0, 0, width, height);
     drawMap();
     hero.draw(context);
 }
 
+
+let title = /** @type {TitleScreen} */ new TitleScreen();
+
+let runGame = false;
 let lastTime; // undefined by default
 /**
  * Where we render the game
@@ -81,12 +84,19 @@ let lastTime; // undefined by default
 function loop(timestamp) {
     // Time step 
     const delta = (lastTime ? timestamp-lastTime : 0) * 1000.0/60.0;
+    context?.clearRect(0, 0, width, height);
 
-    // Space to do the work
-    if (platforms !== undefined) hero.update(canvas, platforms);
-
+    if (!runGame && !title.visible) runGame = true;
+    if (runGame) {
+        // Space to do the work
+        if (platforms !== undefined) hero.update(canvas, platforms);
+    }
     // Now we can render
     drawAll();
+    if (!runGame) {
+        title.draw(context);
+    }
+    
     // and loop
     window.requestAnimationFrame(loop);
 }

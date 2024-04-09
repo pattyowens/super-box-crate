@@ -42,7 +42,7 @@ export class PlayableCharacter {
                     this.moveRight = true;
                     break;
                 case 'w': // Move up
-                    this.vy = -7.5;
+                    this.vy = -8;
                     this.moveDown = true;
                     break;
             }
@@ -87,6 +87,7 @@ export class PlayableCharacter {
         }
         if (this.y - this.radius < 20) {
             this.y = 20 + this.radius;
+            this.vy = 0;
         }
 
 
@@ -96,17 +97,14 @@ export class PlayableCharacter {
             if (stopFall == false) {
                 if ((hero.y + hero.radius) > platform.y && (hero.y - hero.radius) < (platform.y + platform.height) && (hero.x + hero.radius) > platform.x && (hero.x - hero.radius) < (platform.x + platform.width)) {
                     stopFall = true;
-                    hero.stopFall(platform.y - hero.radius);
+                    hero.moveDown = false;
+                    if (hero.vy > 0) hero.y = platform.y - hero.radius;
+                    else hero.y = platform.y + platform.height + hero.radius;
+                    hero.vy = 0;
                 }
             }
         })
         if (!stopFall) this.moveDown = true;
-    }
-
-    stopFall(newY) {
-        this.y = newY;
-        this.moveDown = false;
-        this.vy = 0;
     }
 
     /**
