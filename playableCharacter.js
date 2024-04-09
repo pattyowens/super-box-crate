@@ -157,7 +157,7 @@ export class PlayableCharacter {
         // Then draw
         context.save();
         context.translate(this.x, this.y);
-        context.fillStyle = "red";
+        context.fillStyle = "blue";
         context.moveTo(0, 0);
         context?.beginPath();
         context.arc(0, 0, this.radius, 0, Math.PI * 2);

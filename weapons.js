@@ -44,7 +44,7 @@ export class Weapon {
  * @type {object}
  */
 export class Bullet {
-    constructor(x, y, vx, vy = 0, size = 2) {
+    constructor(x, y, vx, vy = 0, size = 3) {
         this.x = x;
         this.y = y;
         this.vx = vx;
