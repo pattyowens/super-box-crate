@@ -46,9 +46,6 @@ wall_points.forEach(function (w) {
 });
 
 
-// Define the Playable Character
-let hero = /** @type {PlayableCharacter} */ new PlayableCharacter();
-
 /**
  * Draw our map
  */
@@ -125,7 +122,6 @@ function drawAll() {
     //drawBoard();
     drawCrates();
     drawBullets();
-
     drawEnemies();
     hero.draw(context);
 }
@@ -179,18 +175,48 @@ function bulletCollision() {
     }
 }
 
+/**
+ * Determine if the character is dead!
+ * @returns {Boolean} - True if player should die
+ */
+function isDead() {
+    for (let i = 0; i < enemies.length; i++) {
+        if ((hero.y + hero.radius) > enemies[i].y - enemies[i].radius && (hero.y - hero.radius) < (enemies[i].y + enemies[i].radius) && (hero.x + hero.radius) > enemies[i].x - enemies[i].radius && (hero.x - hero.radius) < (enemies[i].x + enemies[i].radius)){
+            return true;
+        }
+    }
+    return false;
+}
 
+/**
+ * Clear an array of undefined object
+ * @param {Object[]} array 
+ */
+function clearObjectArray(array) {
+    if (array.length > 0) array.splice(0);
+}
+
+function endGame() {
+    highestScore = score;
+    score = 0;
+    runGame = false;
+    clearObjectArray(crates);
+    clearObjectArray(bullets);
+    clearObjectArray(enemies);
+    hero = new PlayableCharacter();
+    title.showTitle();
+}
+
+
+let hero = /** @type {PlayableCharacter} */ new PlayableCharacter();
 let title = /** @type {TitleScreen} */ new TitleScreen();
-
 let runGame = false;
 let lastTime;
 let crates = /** @type {Crate} */ [];
-crates.push(new Crate());
 let bullets = /** @type {Bullet} */ [];
 let enemies = /** @type {Enemy} */ [];
-enemies.push(new Enemy());
 let score = 0;
-
+let highestScore = 0;
 
 /**
  * Where we render the game
@@ -200,6 +226,7 @@ function loop(timestamp) {
     // Time step 
     if (lastTime === undefined) lastTime = 0;
     const delta = (timestamp-lastTime) / 1000;
+    //console.log(delta);
     lastTime = timestamp;
     context?.clearRect(0, 0, width, height);
 
@@ -226,6 +253,8 @@ function loop(timestamp) {
                 bullet.update();
             })
             bulletCollision();
+            // EndGame conditions
+            if (isDead()) endGame();
         }
     }
     // Now we can render

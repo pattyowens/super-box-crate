@@ -48,7 +48,7 @@ export class PlayableCharacter {
     /**
      * Fire the weapon!
      * @param {number} delta 
-     * @param {[Bullet]} bullets 
+     * @param {Bullet[]} bullets 
      */
     fireGun(delta, bullets) {
         if (this.weapon.firing == true) {
@@ -66,17 +66,17 @@ export class PlayableCharacter {
      */
     setupKeyboardEvents() {
         document.addEventListener('keydown', (event) => {
-            switch(event.key) {
-                case 'a': // Move left
+            switch(event.code) {
+                case 'KeyA': // Move left
                     this.moveLeft = true;
                     this.lastDirection = -1;
                     break;
-                case 'd': // Move right
+                case 'KeyD': // Move right
                     this.moveRight = true;
                     this.lastDirection = 1;
 
                     break;
-                case 'w': // Move up
+                case 'KeyW': // Move up
                     this.vy = -12;
                     this.moveDown = true;
                     break;
@@ -84,11 +84,11 @@ export class PlayableCharacter {
         });
 
         document.addEventListener('keyup', (event) => {
-            switch(event.key) {
-                case 'a': // Stop moving left
+            switch(event.code) {
+                case 'KeyA': // Stop moving left
                     this.moveLeft = false;
                     break;
-                case 'd': // Stop moving right
+                case 'KeyD': // Stop moving right
                     this.moveRight = false;
                     break;
             }
@@ -98,7 +98,7 @@ export class PlayableCharacter {
     /**
      * Update the character's position based on movement flags.
      * @param {HTMLCanvasElement} canvas 
-     * @param {[Platform]} platforms 
+     * @param {Platform[]} platforms 
      */
     update(canvas, platforms) {
         let stopFall = false;

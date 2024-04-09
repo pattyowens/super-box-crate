@@ -18,12 +18,19 @@ export class TitleScreen {
      */
     setupKeyboardEvents() {
         document.addEventListener('keydown', (event) => {
-            switch(event.key) {
-                case 'p':
+            switch(event.code) {
+                case 'KeyP':
                     this.visible = false;
                     break;
             }
         });
+    }
+
+    /**
+     * Toggle to enable the title screen
+     */
+    showTitle() {
+        this.visible = true;
     }
 
     /**
