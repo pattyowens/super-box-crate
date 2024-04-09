@@ -45,10 +45,8 @@ wall_points.forEach(function (w) {
     walls.push(new Wall(w[0], w[1], w[2], w[3]));
 });
 
-// TODO: Define invisible floors that only npcs can pass through
 
-
-// TODO: Define the Playable Character
+// Define the Playable Character
 let hero = /** @type {PlayableCharacter} */ new PlayableCharacter();
 
 /**
