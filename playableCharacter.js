@@ -1,5 +1,6 @@
 /*jshint esversion: 6 */
 // @ts-check
+import { Platform } from "./boundaries.js";
 
 // A playable character
 /**
@@ -15,7 +16,7 @@ export class PlayableCharacter {
         this.x = x; // Default x position
         this.y = y; // Default y position
         this.speed = speed; // Default speed
-        this.radius = 5;
+        this.radius = 8;
 
         // Movement direction
         this.moveLeft = false;
@@ -41,7 +42,7 @@ export class PlayableCharacter {
                     this.moveRight = true;
                     break;
                 case 'w': // Move up
-                    this.vy = -5;
+                    this.vy = -7.5;
                     this.moveDown = true;
                     break;
             }
@@ -61,15 +62,45 @@ export class PlayableCharacter {
 
     /**
      * Update the character's position based on movement flags.
+     * @param {HTMLCanvasElement} canvas 
+     * @param {[Platform]} platforms 
      */
-    update() {
+    update(canvas, platforms) {
+        let stopFall = false;
         if (this.moveLeft) this.x -= this.speed;
         if (this.moveRight) this.x += this.speed;
         if (this.moveDown) {
-            this.vy += this.ay;
+            if (this.vy <= 5) this.vy += this.ay;
             this.y += this.vy;
         }
-        //if (this.moveUp) this.y -= this.speed; // Assuming the top of the screen is 0, and down is positive
+
+        // Now we do our collision detection
+        // Left wall
+        if (this.x - this.radius < 20) {
+            this.moveLeft = false;
+            this.x = 20 + this.radius;
+        }
+        // Right wall
+        if (this.x + this.radius > canvas.width - 20) {
+            this.moveright = false;
+            this.x = canvas.width - 20 - this.radius;
+        }
+        if (this.y - this.radius < 20) {
+            this.y = 20 + this.radius;
+        }
+
+
+        let hero = this;
+        platforms.forEach(function (platform) {
+            // Check for collision of character and floor
+            if (stopFall == false) {
+                if ((hero.y + hero.radius) > platform.y && (hero.y - hero.radius) < (platform.y + platform.height) && (hero.x + hero.radius) > platform.x && (hero.x - hero.radius) < (platform.x + platform.width)) {
+                    stopFall = true;
+                    hero.stopFall(platform.y - hero.radius);
+                }
+            }
+        })
+        if (!stopFall) this.moveDown = true;
     }
 
     stopFall(newY) {
