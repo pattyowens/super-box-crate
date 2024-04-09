@@ -6,7 +6,7 @@ import { Wall } from "./boundaries.js";
 import { Crate } from "./crates.js";
 import { PlayableCharacter } from "./playableCharacter.js";
 import { TitleScreen } from "./titleScreen.js";
-import { Bullet } from "./weapons.js";
+import { Enemy } from "./enemies.js";
 
 
 /**
@@ -26,10 +26,10 @@ let plat_points = [
     [0.00 * width, 0.65 * height, width / 3],    // mid1 left
     [2/3 * width, 0.65 * height, width / 3],    // mid1 right
     [0.25 * width, 0.80 * height, width / 2],    // Bottom central
-    [0.00 * width, 0.00 * height, width / 2 - 20], // left ceiling
-    [0.50 * width + 20, 0.00 * height, width / 2 - 20], // right ceiling
-    [0.00 * width, 1.00 * height - 20, width / 2 - 20], // left floor
-    [0.50 * width + 20, 1.00 * height - 20, width / 2 - 20] // right floor
+    [0.00 * width, 0.00 * height, width / 2 - 60], // left ceiling
+    [0.50 * width + 60, 0.00 * height, width / 2 - 60], // right ceiling
+    [0.00 * width, 1.00 * height - 20, width / 2 - 40], // left floor
+    [0.50 * width + 40, 1.00 * height - 20, width / 2 - 40] // right floor
 ];
 let platforms = /** @type {[Platform]} */ [];
 plat_points.forEach(function (p) {
@@ -45,9 +45,6 @@ wall_points.forEach(function (w) {
     walls.push(new Wall(w[0], w[1], w[2], w[3]));
 });
 
-
-// Define the Playable Character
-let hero = /** @type {PlayableCharacter} */ new PlayableCharacter();
 
 /**
  * Draw our map
@@ -82,7 +79,12 @@ function drawScore() {
     context?.translate(30, 50);
     context.fillStyle = "black";
     context.font = "36px serif";
+    if (highestScore !== 0) {
+        context.fillText("Best:   " + highestScore, 0, 0, 500);
+        context?.translate(0, 30);
+    }
     context.fillText("Score: " + score, 0, 0, 500);
+    
     context?.restore()
 }
 
@@ -110,6 +112,12 @@ function drawBullets() {
     })
 }
 
+function drawEnemies() {
+    enemies.forEach(function (enemy) {
+        enemy.draw(context);
+    })
+}
+
 /**
  * Wrapper for drawing all objects, establishes draw order
  */
@@ -119,7 +127,7 @@ function drawAll() {
     //drawBoard();
     drawCrates();
     drawBullets();
-
+    drawEnemies();
     hero.draw(context);
 }
 
@@ -162,20 +170,59 @@ function bulletCollision() {
                 remove = true;
             }
         });
+        if (!remove) for (let j = enemies.length - 1; j >= 0; j--) {
+            if ((bullets[i].y + bullets[i].radius) > enemies[j].y - enemies[j].radius && (bullets[i].y - bullets[i].radius) < (enemies[j].y + enemies[j].radius) && (bullets[i].x + bullets[i].radius) > enemies[j].x - enemies[j].radius && (bullets[i].x - bullets[i].radius) < (enemies[j].x + enemies[j].radius)) {
+                remove = true;
+                enemies.splice(j, 1);
+            }
+        }
         if (remove) bullets.splice(i, 1);
     }
 }
 
+/**
+ * Determine if the character is dead!
+ * @returns {Boolean} - True if player should die
+ */
+function isDead() {
+    for (let i = 0; i < enemies.length; i++) {
+        if ((hero.y + hero.radius) > enemies[i].y - enemies[i].radius && (hero.y - hero.radius) < (enemies[i].y + enemies[i].radius) && (hero.x + hero.radius) > enemies[i].x - enemies[i].radius && (hero.x - hero.radius) < (enemies[i].x + enemies[i].radius)){
+            return true;
+        }
+    }
+    return false;
+}
 
+/**
+ * Clear an array of undefined object
+ * @param {Object[]} array 
+ */
+function clearObjectArray(array) {
+    if (array.length > 0) array.splice(0);
+}
+
+function endGame() {
+    if (score > highestScore) highestScore = score;
+    score = 0;
+    runGame = false;
+    clearObjectArray(crates);
+    clearObjectArray(bullets);
+    clearObjectArray(enemies);
+    hero = new PlayableCharacter();
+    title.showTitle();
+}
+
+
+let hero = /** @type {PlayableCharacter} */ new PlayableCharacter();
 let title = /** @type {TitleScreen} */ new TitleScreen();
-
 let runGame = false;
 let lastTime;
 let crates = /** @type {Crate} */ [];
-crates.push(new Crate());
-let score = 0;
-
 let bullets = /** @type {Bullet} */ [];
+let enemies = /** @type {Enemy} */ [];
+let score = 0;
+let highestScore = 0;
+
 /**
  * Where we render the game
  * @param {number} timestamp 
@@ -184,6 +231,7 @@ function loop(timestamp) {
     // Time step 
     if (lastTime === undefined) lastTime = 0;
     const delta = (timestamp-lastTime) / 1000;
+    //console.log(delta);
     lastTime = timestamp;
     context?.clearRect(0, 0, width, height);
 
@@ -193,17 +241,25 @@ function loop(timestamp) {
         if (crates.length == 0) {
             crates.push(new Crate());
         }
-        if (platforms !== undefined && crates !== undefined && bullets !== undefined) {
+        if (enemies.length < score + 1) {
+            enemies.push(new Enemy());
+        }
+        if (platforms !== undefined && crates !== undefined && bullets !== undefined && enemies !== undefined) {
             hero.update(canvas, platforms);
             crates.forEach(function (crate) {
                 crate.update(canvas, platforms);
             })
             collectCrate();
+            enemies.forEach(function (enemy) {
+                enemy.update(canvas, platforms);
+            })
             hero.fireGun(delta, bullets);
             bullets.forEach(function (bullet) {
                 bullet.update();
             })
             bulletCollision();
+            // EndGame conditions
+            if (isDead()) endGame();
         }
     }
     // Now we can render
