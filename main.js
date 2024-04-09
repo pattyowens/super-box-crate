@@ -2,13 +2,14 @@
 // @ts-check
 
 import { Platform } from "./boundaries.js";
+import { PlayableCharacter } from "./playableCharacter.js";
 
 
 /**
  * Set up the UI
  */
 let canvas = /** @type {HTMLCanvasElement} */ (document.getElementById("canvas1"));
-let context = /** @type {CanvasRenderingContext2D} */ canvas.getContext("2d");
+const context = /** @type {CanvasRenderingContext2D} */ canvas.getContext("2d");
 
 // Define our initial map
 let width = canvas.width;
@@ -27,24 +28,47 @@ let plat_points = [
     [1.00 * width - 10, 0.00 * height, 10, height],    // Right wall
     [0.00 * width, 0.00 * height, width / 2 - 20], // left ceiling
     [0.50 * width + 40, 0.00 * height, width / 2 - 20], // right ceiling
-    [0.00 * width, 1.00 * height - 10, width / 2 - 20], // left ceiling
-    [0.50 * width + 40, 1.00 * height - 10, width / 2 - 20] // right ceiling
+    [0.00 * width, 1.00 * height - 20, width / 2 - 20], // left ceiling
+    [0.50 * width + 40, 1.00 * height - 20, width / 2 - 20] // right ceiling
 ];
-
 let platforms = /** @type {[Platform]} */ [];
-
 plat_points.forEach(function (p) {
     platforms.push(new Platform(p[0], p[1], p[2], p[3]));
 })
 
+// TODO: Define invisible floors that only npcs can pass through
+
+
+// TODO: Define the Playable Character
+let hero = /** @type {PlayableCharacter} */ new PlayableCharacter();
+
+/**
+ * Draw our map
+ */
 function drawMap() {
+    let stopFall = false;
     platforms.forEach(function (platform) {
         platform.draw(context);
+        
+        // Check for collision of character and floor, only do once per draw cycle
+        if (stopFall == false) {
+            if ((hero.y + hero.radius) > platform.y && (hero.y - hero.radius) < (platform.y + platform.height) && (hero.x + hero.radius) > platform.x && (hero.x - hero.radius) < (platform.x + platform.width)) {
+                stopFall = true;
+                hero.stopFall(platform.y - hero.radius);
+            }
+        }
     })
+    if (!stopFall) hero.moveDown = true;
 }
 
+
+/**
+ * Wrapper for drawing all objects, establishes draw order
+ */
 function drawAll() {
+    context?.clearRect(0, 0, width, height);
     drawMap();
+    hero.draw(context);
 }
 
 let lastTime; // undefined by default
@@ -57,7 +81,7 @@ function loop(timestamp) {
     const delta = (lastTime ? timestamp-lastTime : 0) * 1000.0/60.0;
 
     // Space to do the work
-
+    hero.update();
 
     // Now we can render
     drawAll();
