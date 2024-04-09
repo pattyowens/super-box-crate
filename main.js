@@ -3,6 +3,7 @@
 
 import { Platform } from "./boundaries.js";
 import { Wall } from "./boundaries.js";
+import { Crate } from "./crates.js";
 import { PlayableCharacter } from "./playableCharacter.js";
 import { TitleScreen } from "./titleScreen.js";
 
@@ -68,11 +69,61 @@ function drawMap() {
 }
 
 /**
+ * Draw the crate
+ * - Support multiple crates if we wanna get crazy later on
+ */
+function drawCrates() {
+    crates.forEach(function (crate) {
+        crate.draw(context);
+    })
+}
+
+function drawScore() {
+    context?.save();
+    context?.translate(30, 50);
+    context.fillStyle = "black";
+    context.font = "36px serif";
+    context.fillText("Score: " + score, 0, 0, 500);
+    context?.restore()
+}
+
+// Debugging board
+function drawBoard(){
+    context?.save();
+    let p = 0;
+    for (var x = 0; x <= canvas.width; x += 40) {
+        context.moveTo(0.5 + x + p, p);
+        context.lineTo(0.5 + x + p, canvas.height + p);
+    }
+
+    for (var x = 0; x <= canvas.height; x += 40) {
+        context.moveTo(p, 0.5 + x + p);
+        context.lineTo(canvas.width + p, 0.5 + x + p);
+    }
+    context.strokeStyle = "black";
+    context.stroke();
+    context?.restore();
+}
+
+/**
  * Wrapper for drawing all objects, establishes draw order
  */
 function drawAll() {
     drawMap();
+    drawScore();
+    drawBoard();
+    drawCrates();
+
     hero.draw(context);
+}
+
+function collectCrate() {
+    for (let i = crates.length - 1; i >= 0; i--) {
+        if (hero.x + hero.radius > crates[i].x && hero.x - hero.radius < crates[i].x + crates[i].length && hero.y + hero.radius > crates[i].y && hero.y - hero.radius < crates[i].y + crates[i].length) {
+            crates.splice(i);
+            score++;
+        }
+    }
 }
 
 
@@ -80,6 +131,9 @@ let title = /** @type {TitleScreen} */ new TitleScreen();
 
 let runGame = false;
 let lastTime; // undefined by default
+let crates = /** @type {Crate} */ [];
+crates.push(new Crate());
+let score = 0;
 /**
  * Where we render the game
  * @param {*} timestamp 
@@ -92,7 +146,16 @@ function loop(timestamp) {
     if (!runGame && !title.visible) runGame = true;
     if (runGame) {
         // Space to do the work
-        if (platforms !== undefined) hero.update(canvas, platforms);
+        if (crates.length == 0) {
+            crates.push(new Crate());
+        }
+        if (platforms !== undefined && crates !== undefined) {
+            hero.update(canvas, platforms);
+            crates.forEach(function (crate) {
+                crate.update(canvas, platforms);
+            })
+            collectCrate();
+        }
     }
     // Now we can render
     drawAll();

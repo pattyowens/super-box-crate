@@ -1,6 +1,7 @@
 /*jshint esversion: 6 */
 // @ts-check
 import { Platform } from "./boundaries.js";
+import { Crate } from "./crates.js";
 
 // A playable character
 /**
@@ -12,18 +13,18 @@ export class PlayableCharacter {
      * @param {number} y - The starting y position
      * @param {number} speed - The movement speed
      */
-    constructor(x = 400, y = 350, speed = 5) {
+    constructor(x = 400, y = 350, speed = 6) {
         this.x = x; // Default x position
         this.y = y; // Default y position
         this.speed = speed; // Default speed
-        this.radius = 8;
+        this.radius = 12;
 
         // Movement direction
         this.moveLeft = false;
         this.moveRight = false;
         this.moveDown = true;
         this.vy = 0;
-        this.ay = 0.3;
+        this.ay = 0.4;
 
         // Setup keyboard events
         this.setupKeyboardEvents();
@@ -42,7 +43,7 @@ export class PlayableCharacter {
                     this.moveRight = true;
                     break;
                 case 'w': // Move up
-                    this.vy = -10;
+                    this.vy = -12;
                     this.moveDown = true;
                     break;
             }
@@ -70,7 +71,7 @@ export class PlayableCharacter {
         if (this.moveLeft) this.x -= this.speed;
         if (this.moveRight) this.x += this.speed;
         if (this.moveDown) {
-            if (this.vy <= 5) this.vy += this.ay;
+            if (this.vy <= 8) this.vy += this.ay;
             this.y += this.vy;
         }
 
