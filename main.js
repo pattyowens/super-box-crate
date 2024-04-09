@@ -25,9 +25,9 @@ let plat_points = [
     [2/3 * width, 0.65 * height, width / 3],    // mid1 right
     [0.25 * width, 0.80 * height, width / 2],    // Bottom central
     [0.00 * width, 0.00 * height, width / 2 - 20], // left ceiling
-    [0.50 * width + 40, 0.00 * height, width / 2 - 20], // right ceiling
-    [0.00 * width, 1.00 * height - 20, width / 2 - 20], // left ceiling
-    [0.50 * width + 40, 1.00 * height - 20, width / 2 - 20] // right ceiling
+    [0.50 * width + 20, 0.00 * height, width / 2 - 20], // right ceiling
+    [0.00 * width, 1.00 * height - 20, width / 2 - 20], // left floor
+    [0.50 * width + 20, 1.00 * height - 20, width / 2 - 20] // right floor
 ];
 let platforms = /** @type {[Platform]} */ [];
 plat_points.forEach(function (p) {
@@ -53,6 +53,11 @@ let hero = /** @type {PlayableCharacter} */ new PlayableCharacter();
  * Draw our map
  */
 function drawMap() {
+    context?.save();
+    context.fillStyle = "brown";
+    context?.fillRect(0.50 * width - 20, canvas.height - 20, 40, 10);
+    context?.restore();
+
     platforms.forEach(function (platform) {
         platform.draw(context);
     })
