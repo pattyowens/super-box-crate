@@ -18,13 +18,11 @@ let width = canvas.width;
 let height = canvas.height;
 let plat_points = [
     [0.25 * width, 0.20 * height, width / 2],    // Upper central
-    [0.10 * width, 0.35 * height, width / 4],    // mid1 left
-    [0.65 * width, 0.35 * height, width / 4],    // mid1 right
+    [0.00 * width, 0.35 * height, width / 3],    // mid1 left
+    [2/3 * width, 0.35 * height, width / 3],    // mid1 right
     [0.25 * width, 0.50 * height, width / 2],    // mid2 central
-    [0.10 * width, 0.65 * height, width / 4],    // mid1 left
-    [0.65 * width, 0.65 * height, width / 4],    // mid1 right
-    [0.00 * width, 0.80 * height, width / 5],    // bottom left
-    [0.80 * width, 0.80 * height, width / 5],    // bottom right
+    [0.00 * width, 0.65 * height, width / 3],    // mid1 left
+    [2/3 * width, 0.65 * height, width / 3],    // mid1 right
     [0.25 * width, 0.80 * height, width / 2],    // Bottom central
     [0.00 * width, 0.00 * height, width / 2 - 20], // left ceiling
     [0.50 * width + 40, 0.00 * height, width / 2 - 20], // right ceiling

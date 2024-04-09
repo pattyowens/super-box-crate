@@ -23,7 +23,7 @@ export class PlayableCharacter {
         this.moveRight = false;
         this.moveDown = true;
         this.vy = 0;
-        this.ay = 0.2;
+        this.ay = 0.3;
 
         // Setup keyboard events
         this.setupKeyboardEvents();
@@ -42,7 +42,7 @@ export class PlayableCharacter {
                     this.moveRight = true;
                     break;
                 case 'w': // Move up
-                    this.vy = -8;
+                    this.vy = -10;
                     this.moveDown = true;
                     break;
             }
@@ -85,11 +85,16 @@ export class PlayableCharacter {
             this.moveright = false;
             this.x = canvas.width - 20 - this.radius;
         }
+        // Invisible Ceiling
         if (this.y - this.radius < 20) {
             this.y = 20 + this.radius;
             this.vy = 0;
         }
-
+        // Invisible Floor
+        if (this.y + this.radius > canvas.height - 20) {
+            this.y = canvas.height - 20 - this.radius;
+            this.vy = 0;
+        }
 
         let hero = this;
         platforms.forEach(function (platform) {
@@ -98,8 +103,10 @@ export class PlayableCharacter {
                 if ((hero.y + hero.radius) > platform.y && (hero.y - hero.radius) < (platform.y + platform.height) && (hero.x + hero.radius) > platform.x && (hero.x - hero.radius) < (platform.x + platform.width)) {
                     stopFall = true;
                     hero.moveDown = false;
-                    if (hero.vy > 0) hero.y = platform.y - hero.radius;
-                    else hero.y = platform.y + platform.height + hero.radius;
+                    if (hero.y > platform.y + platform.height / 2) {
+                        hero.y = platform.y + platform.height + hero.radius;
+                    } 
+                    else hero.y = platform.y - hero.radius;
                     hero.vy = 0;
                 }
             }
