@@ -79,7 +79,12 @@ function drawScore() {
     context?.translate(30, 50);
     context.fillStyle = "black";
     context.font = "36px serif";
+    if (highestScore !== 0) {
+        context.fillText("Best:   " + highestScore, 0, 0, 500);
+        context?.translate(0, 30);
+    }
     context.fillText("Score: " + score, 0, 0, 500);
+    
     context?.restore()
 }
 
@@ -197,7 +202,7 @@ function clearObjectArray(array) {
 }
 
 function endGame() {
-    highestScore = score;
+    if (score > highestScore) highestScore = score;
     score = 0;
     runGame = false;
     clearObjectArray(crates);
