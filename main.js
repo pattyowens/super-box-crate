@@ -231,6 +231,13 @@ function endGame() {
     title.showTitle();
 }
 
+// Spawn a new crate if none are on the field
+function spawnCrate() {
+    if (crates.length == 0) {
+        crates.push(new Crate());
+    }
+}
+
 
 let hero = /** @type {PlayableCharacter} */ new PlayableCharacter();
 let title = /** @type {TitleScreen} */ new TitleScreen();
@@ -241,6 +248,17 @@ let bullets = /** @type {Bullet} */ [];
 let enemies = /** @type {Enemy} */ [];
 let score = 0;
 let highestScore = 0;
+let timeSinceLastSpawn = 0;
+
+// Spawn another enemy if under maximum for level
+function spawnEnemy() {
+    if (timeSinceLastSpawn > (3 - (score - enemies.length) * 0.5)) {
+        timeSinceLastSpawn = 0;
+        if (enemies.length < score + 1) {
+            enemies.push(new Enemy());
+        }
+    }
+}
 
 /**
  * Where we run the game
@@ -251,20 +269,17 @@ function loop(timestamp) {
     if (lastTime === undefined) lastTime = 0;
     const delta = (timestamp-lastTime) / 1000;
     let adjDelta = delta * 50;
-    //console.log(delta);
     lastTime = timestamp;
+    timeSinceLastSpawn += delta;
+
     context?.clearRect(0, 0, width, height);
     console.log(hero.jumpCount);
 
     if (!runGame && !title.visible) runGame = true;
     if (runGame) {
         // Space to do the work
-        if (crates.length == 0) {
-            crates.push(new Crate());
-        }
-        if (enemies.length < score + 1) {
-            enemies.push(new Enemy());
-        }
+        spawnCrate();
+        spawnEnemy();
         if (platforms !== undefined && crates !== undefined && bullets !== undefined && enemies !== undefined) {
             hero.update(canvas, platforms, adjDelta);
             crates.forEach(function (crate) {
