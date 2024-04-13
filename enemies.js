@@ -15,7 +15,7 @@ export class Enemy {
         if (Math.random() > 0.5) this.direction = 1;
         else this.direction = -1;
         this.vy = 0;
-        this.ay = 0.5;
+        this.ay = 0.6;
         
         this.radius = size;
         this.color = color;

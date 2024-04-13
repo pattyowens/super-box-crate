@@ -34,7 +34,7 @@ export class PlayableCharacter {
         this.lastDirection = -1;
         this.moveDown = true;
         this.vy = 0;
-        this.ay = 0.4;
+        this.ay = 0.6;
         this.jumpCount = 0;
 
         // Setup keyboard events
@@ -80,7 +80,7 @@ export class PlayableCharacter {
                 case 'KeyW': // Move up
                     this.jumpCount++;
                     if (this.jumpCount > 1) break;
-                    this.vy = -12;
+                    this.vy = -14;
                     this.moveDown = true;
                     break;
             }
@@ -156,19 +156,33 @@ export class PlayableCharacter {
     }
 
     /**
+     * Draw the hero's gun
+     * @param {CanvasRenderingContext2D} context 
+     */
+    drawGun(context) {
+        context.save();
+        context.fillStyle = "black";
+        context.scale(this.lastDirection, 1);
+        context.fillRect(0, 0, 20, 5);
+        context.restore();
+    }
+
+    /**
      * Draw the hero
      * @param {CanvasRenderingContext2D} context 
      */
     draw(context) {
         // Then draw
         context.save();
-        context.translate(this.x, this.y);
-        context.fillStyle = "blue";
-        context.moveTo(0, 0);
-        context?.beginPath();
-        context.arc(0, 0, this.radius, 0, Math.PI * 2);
-        context?.closePath();
-        context.fill();
+            context.translate(this.x, this.y);
+            if (this.lastDirection == -1) this.drawGun(context);
+            context.fillStyle = "blue";
+            context.moveTo(0, 0);
+            context?.beginPath();
+            context.arc(0, 0, this.radius, 0, Math.PI * 2);
+            context?.closePath();
+            context.fill();
+            if (this.lastDirection == 1) this.drawGun(context);
         context.restore();
     }
 

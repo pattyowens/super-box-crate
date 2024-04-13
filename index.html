@@ -4,12 +4,65 @@
     <meta charset="UTF-8">
     <title>Super Box Crate</title>
     <link rel="icon" sizes="32x32" type="image/png" href="./icons8-apple-arcade-32.png"> 
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      
+      /* Create two equal columns that floats next to each other */
+      .column-left {
+        float: left;
+        width: 800px;
+        padding: 10px;
+      }
+      .column-right {
+        float: left;
+        width: 50%;
+        padding: 20px;
+      }
+      
+      /* Clear floats after the columns */
+      .row:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+      
+      /* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+      @media screen and (max-width: 1630px) {
+        .column-left {
+          width: 100%;
+        }
+        .column-right {
+          width: 100%;
+          float: left;
+        }
+      }
+      </style>
   </head>
   <body>
-    <canvas id="canvas1" height="800" width="800"></canvas>
+    <div class="row">
+      <div class="column-left" width="800">
+        <canvas id="canvas1" height="800" width="800"></canvas>
+        <br>
+        <a target="_blank" href="https://icons8.com/icon/GdTfmvALOWwB/apple-arcade">Game</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+        <script src="./main.js" type="module" defer></script>
+      </div>
+      <div class="column-right">
+        <H2>Controls</H2>
+        <p>A - Left</p>
+        <p>D - Right</p>
+        <p>W - Jump</p>
+        <p>Space - Shoot</p>
+        <H2>Summary</H2>
+        <p>This project is meant to be a remake of a 2D freeware game on Steam called ‘Super Crate Box’. I played the hell out of it in middle school when it first came out. My intent was to remake this game within the confines of an HTML canvas, using only the drawing functions we covered in my class (CS 559 - Computer Graphics) to create the game.</p>
+        <p>The game is rather simple, with a simple menu to start the game, and the game itself. The premise is that the playable character must collect crates. However, there are enemies that drop into the map and if any non-playable characters (NPC)s touch the playable character (PC), then the game is over. Each crate that is collected awards the PC with a different (random) projectile weapon and increments the score. There is no victory condition, only survive as long as possible to obtain the highest score.</p>
+      </div>
+      </div>
+    
 
-    <script src="./main.js" type="module" defer></script>
-    <br>
-    <a target="_blank" href="https://icons8.com/icon/GdTfmvALOWwB/apple-arcade">Game</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+    
+    
+    
   </body>
 </html>
