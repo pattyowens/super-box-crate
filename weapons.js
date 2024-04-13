@@ -54,10 +54,11 @@ export class Bullet {
 
     /**
      * Update the bullet's position
+     * @param {number} delta 
      */
-    update() {
-        this.x += this.vx;
-        this.y += this.vy;
+    update(delta) {
+        this.x += this.vx * delta;
+        this.y += this.vy * delta;
     }
 
     /**

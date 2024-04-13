@@ -250,9 +250,11 @@ function loop(timestamp) {
     // Time step 
     if (lastTime === undefined) lastTime = 0;
     const delta = (timestamp-lastTime) / 1000;
+    let adjDelta = delta * 50;
     //console.log(delta);
     lastTime = timestamp;
     context?.clearRect(0, 0, width, height);
+    console.log(hero.jumpCount);
 
     if (!runGame && !title.visible) runGame = true;
     if (runGame) {
@@ -264,17 +266,17 @@ function loop(timestamp) {
             enemies.push(new Enemy());
         }
         if (platforms !== undefined && crates !== undefined && bullets !== undefined && enemies !== undefined) {
-            hero.update(canvas, platforms);
+            hero.update(canvas, platforms, adjDelta);
             crates.forEach(function (crate) {
                 crate.update(canvas, platforms);
             })
             collectCrate();
             enemies.forEach(function (enemy) {
-                enemy.update(canvas, platforms, delta);
+                enemy.update(canvas, platforms, adjDelta);
             })
-            hero.fireGun(delta, bullets);
+            hero.fireGun(delta, adjDelta, bullets);
             bullets.forEach(function (bullet) {
-                bullet.update();
+                bullet.update(adjDelta);
             })
             bulletCollision();
             // EndGame conditions

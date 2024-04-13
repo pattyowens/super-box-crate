@@ -30,10 +30,9 @@ export class Enemy {
      */
     update(canvas, platforms, delta) {
         let stopFall = false;
-        let hardwareMod = delta * 50;
-        this.x += this.speed * this.direction * hardwareMod;
+        this.x += this.speed * this.direction * delta;
         if (this.moveDown) {
-            if (this.vy <= 8) this.vy += this.ay * hardwareMod;
+            if (this.vy <= 8) this.vy += this.ay * delta;
             this.y += this.vy;
         }
 
