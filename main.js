@@ -53,7 +53,7 @@ wall_points.forEach(function (w) {
 function drawMap() {
     context?.save();
     context.fillStyle = "brown";
-    context?.fillRect(0.50 * width - 20, canvas.height - 20, 40, 10);
+    context?.fillRect(0.50 * width - 40, canvas.height - 20, 80, 10);
     context?.restore();
 
     platforms.forEach(function (platform) {
@@ -92,7 +92,7 @@ function drawScore() {
     context?.restore()
 }
 
-// Debugging grid
+// Debugging grid - Got this from a stack overflow thread
 function drawBoard() {
     context?.save();
     let p = 0;
@@ -282,7 +282,7 @@ function loop(timestamp) {
     timeSinceLastSpawn += delta;
 
     context?.clearRect(0, 0, width, height);
-    console.log(hero.jumpCount);
+    //console.log(hero.jumpCount);
 
     if (!runGame && !title.visible) runGame = true;
     if (runGame) {

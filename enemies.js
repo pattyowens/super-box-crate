@@ -32,8 +32,8 @@ export class Enemy {
         let stopFall = false;
         this.x += this.speed * this.direction * delta;
         if (this.moveDown) {
-            if (this.vy <= 8) this.vy += this.ay * delta;
-            this.y += this.vy;
+            if (this.vy <= 8) this.vy += this.ay;
+            this.y += this.vy * delta;
         }
 
         // Now we do our collision detection

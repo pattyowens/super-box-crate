@@ -53,7 +53,7 @@ export class PlayableCharacter {
      */
     fireGun(delta, adjDelta, bullets) {
         if (this.weapon.firing == true) {
-            if (this.weapon.timeDown == 0) bullets.push(new Bullet(this.x, this.y, 10 * this.lastDirection, this.vy));
+            if (this.weapon.timeDown == 0) bullets.push(new Bullet(this.x, this.y, 15 * this.lastDirection, this.vy / 2));
             if (this.weapon.timeDown > (1 / this.weapon.fireRate)) {
                 this.weapon.timeDown = 0;
                 bullets.push(new Bullet(this.x, this.y, 15 * this.lastDirection, this.vy / 2));
@@ -80,7 +80,7 @@ export class PlayableCharacter {
                 case 'KeyW': // Move up
                     this.jumpCount++;
                     if (this.jumpCount>2) break;
-                    this.vy = -6.5;
+                    this.vy = -12;
                     this.moveDown = true;
                     break;
             }
@@ -109,8 +109,8 @@ export class PlayableCharacter {
         if (this.moveLeft) this.x -= this.speed * delta;
         if (this.moveRight) this.x += this.speed * delta;
         if (this.moveDown) {
-            if (this.vy <= 8) this.vy += this.ay * delta;
-            this.y += this.vy;
+            if (this.vy <= 8) this.vy += this.ay;
+            this.y += this.vy * delta;
         }
 
         // Now we do our collision detection
