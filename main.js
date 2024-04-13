@@ -7,6 +7,7 @@ import { Crate } from "./crates.js";
 import { PlayableCharacter } from "./playableCharacter.js";
 import { TitleScreen } from "./titleScreen.js";
 import { Enemy } from "./enemies.js";
+import { Bullet } from "./weapons.js";
 
 
 /**
@@ -52,7 +53,7 @@ wall_points.forEach(function (w) {
 function drawMap() {
     context?.save();
     context.fillStyle = "brown";
-    context?.fillRect(0.50 * width - 20, canvas.height - 20, 40, 10);
+    context?.fillRect(0.50 * width - 40, canvas.height - 20, 80, 10);
     context?.restore();
 
     platforms.forEach(function (platform) {
@@ -74,6 +75,9 @@ function drawCrates() {
     })
 }
 
+/**
+ * Draw the Score & Session hi-score
+ */
 function drawScore() {
     context?.save();
     context?.translate(30, 50);
@@ -88,7 +92,7 @@ function drawScore() {
     context?.restore()
 }
 
-// Debugging board
+// Debugging grid - Got this from a stack overflow thread
 function drawBoard() {
     context?.save();
     let p = 0;
@@ -106,12 +110,18 @@ function drawBoard() {
     context?.restore();
 }
 
+/**
+ * Wrapper to render each bullet
+ */
 function drawBullets() {
     bullets.forEach(function (bullet) {
         bullet.draw(context);
     })
 }
 
+/**
+ * Wrapper to render each enemy
+ */
 function drawEnemies() {
     enemies.forEach(function (enemy) {
         enemy.draw(context);
@@ -131,6 +141,9 @@ function drawAll() {
     hero.draw(context);
 }
 
+/**
+ * Detect if a crate has been collected by the player
+ */
 function collectCrate() {
     for (let i = crates.length - 1; i >= 0; i--) {
         if (hero.x + hero.radius > crates[i].x && hero.x - hero.radius < crates[i].x + crates[i].length && hero.y + hero.radius > crates[i].y && hero.y - hero.radius < crates[i].y + crates[i].length) {
@@ -141,6 +154,9 @@ function collectCrate() {
     }
 }
 
+/**
+ * Handle the collision of bullets with the platforms, wall, ceilings, and enemies
+ */
 function bulletCollision() {
     for (let i = bullets.length - 1; i >= 0; i--) {
         // Left wall
@@ -201,6 +217,10 @@ function clearObjectArray(array) {
     if (array.length > 0) array.splice(0);
 }
 
+/**
+ * Handle the different elemenets required for ending the current game and 
+ * returning to the title to start a new one 
+ */
 function endGame() {
     if (score > highestScore) highestScore = score;
     score = 0;
@@ -212,6 +232,30 @@ function endGame() {
     title.showTitle();
 }
 
+// Spawn a new crate if none are on the field
+function spawnCrate() {
+    if (crates.length == 0) {
+        crates.push(new Crate());
+    }
+}
+
+// Spawn another enemy if under maximum for level
+function spawnEnemy() {
+    if (timeSinceLastSpawn > (3 - (score - enemies.length) * 0.5)) {
+        timeSinceLastSpawn = 0;
+        if (enemies.length < score + 1) {
+            let speed = 4 + Math.floor(score * Math.random() / 3);
+            let size = speed * 2;
+            if (size > 20) size = 20;
+            let modifier = (speed - 4) * 30;
+            if (modifier > 255) modifier = 255;
+            let red = 255 - modifier;
+            let green = modifier;
+            let color = "rgb(" + red + ", " + green + ", 0)";
+            enemies.push(new Enemy(speed, size, color));
+        }
+    }
+}
 
 let hero = /** @type {PlayableCharacter} */ new PlayableCharacter();
 let title = /** @type {TitleScreen} */ new TitleScreen();
@@ -222,40 +266,41 @@ let bullets = /** @type {Bullet} */ [];
 let enemies = /** @type {Enemy} */ [];
 let score = 0;
 let highestScore = 0;
+let timeSinceLastSpawn = 0;
+
 
 /**
- * Where we render the game
+ * Where we run the game
  * @param {number} timestamp 
  */
 function loop(timestamp) {
     // Time step 
     if (lastTime === undefined) lastTime = 0;
     const delta = (timestamp-lastTime) / 1000;
-    //console.log(delta);
+    let adjDelta = delta * 50;
     lastTime = timestamp;
+    timeSinceLastSpawn += delta;
+
     context?.clearRect(0, 0, width, height);
+    //console.log(hero.jumpCount);
 
     if (!runGame && !title.visible) runGame = true;
     if (runGame) {
         // Space to do the work
-        if (crates.length == 0) {
-            crates.push(new Crate());
-        }
-        if (enemies.length < score + 1) {
-            enemies.push(new Enemy());
-        }
+        spawnCrate();
+        spawnEnemy();
         if (platforms !== undefined && crates !== undefined && bullets !== undefined && enemies !== undefined) {
-            hero.update(canvas, platforms);
+            hero.update(canvas, platforms, adjDelta);
             crates.forEach(function (crate) {
                 crate.update(canvas, platforms);
             })
             collectCrate();
             enemies.forEach(function (enemy) {
-                enemy.update(canvas, platforms);
+                enemy.update(canvas, platforms, adjDelta);
             })
-            hero.fireGun(delta, bullets);
+            hero.fireGun(delta, adjDelta, bullets);
             bullets.forEach(function (bullet) {
-                bullet.update();
+                bullet.update(adjDelta);
             })
             bulletCollision();
             // EndGame conditions

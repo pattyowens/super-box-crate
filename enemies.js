@@ -15,7 +15,7 @@ export class Enemy {
         if (Math.random() > 0.5) this.direction = 1;
         else this.direction = -1;
         this.vy = 0;
-        this.ay = 0.5;
+        this.ay = 0.6;
         
         this.radius = size;
         this.color = color;
@@ -26,13 +26,14 @@ export class Enemy {
      * Update the enemy's position 
      * @param {HTMLCanvasElement} canvas 
      * @param {[Platform]} platforms 
+     * @param {number} delta
      */
-    update(canvas, platforms) {
+    update(canvas, platforms, delta) {
         let stopFall = false;
-        this.x += this.speed * this.direction;
+        this.x += this.speed * this.direction * delta;
         if (this.moveDown) {
             if (this.vy <= 8) this.vy += this.ay;
-            this.y += this.vy;
+            this.y += this.vy * delta;
         }
 
         // Now we do our collision detection
@@ -46,11 +47,6 @@ export class Enemy {
             this.switchDirection();
             this.x = canvas.width - 20 - this.radius;
         }
-        // // Invisible Ceiling
-        // if (this.y - this.radius < 20) {
-        //     this.y = 20 + this.radius;
-        //     this.vy = 0;
-        // }
         // Invisible Floor
         if (this.y - this.radius > canvas.height) {
             this.y = 0 - this.radius;

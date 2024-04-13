@@ -34,7 +34,8 @@ export class PlayableCharacter {
         this.lastDirection = -1;
         this.moveDown = true;
         this.vy = 0;
-        this.ay = 0.4;
+        this.ay = 0.6;
+        this.jumpCount = 0;
 
         // Setup keyboard events
         this.setupKeyboardEvents();
@@ -47,15 +48,15 @@ export class PlayableCharacter {
 
     /**
      * Fire the weapon!
-     * @param {number} delta 
+     * @param {number} delta
      * @param {Bullet[]} bullets 
      */
-    fireGun(delta, bullets) {
+    fireGun(delta, adjDelta, bullets) {
         if (this.weapon.firing == true) {
-            if (this.weapon.timeDown == 0) bullets.push(new Bullet(this.x, this.y, 10 * this.lastDirection, this.vy));
+            if (this.weapon.timeDown == 0) bullets.push(new Bullet(this.x, this.y, 15 * this.lastDirection, this.vy / 2));
             if (this.weapon.timeDown > (1 / this.weapon.fireRate)) {
                 this.weapon.timeDown = 0;
-                bullets.push(new Bullet(this.x, this.y, 10 * this.lastDirection, this.vy));
+                bullets.push(new Bullet(this.x, this.y, 15 * this.lastDirection, this.vy / 2));
             }
             this.weapon.timeDown += delta;
         }
@@ -77,7 +78,9 @@ export class PlayableCharacter {
 
                     break;
                 case 'KeyW': // Move up
-                    this.vy = -12;
+                    this.jumpCount++;
+                    if (this.jumpCount > 1) break;
+                    this.vy = -14;
                     this.moveDown = true;
                     break;
             }
@@ -98,15 +101,16 @@ export class PlayableCharacter {
     /**
      * Update the character's position based on movement flags.
      * @param {HTMLCanvasElement} canvas 
-     * @param {Platform[]} platforms 
+     * @param {Platform[]} platforms
+     * @param {number} delta 
      */
-    update(canvas, platforms) {
+    update(canvas, platforms, delta) {
         let stopFall = false;
-        if (this.moveLeft) this.x -= this.speed;
-        if (this.moveRight) this.x += this.speed;
+        if (this.moveLeft) this.x -= this.speed * delta;
+        if (this.moveRight) this.x += this.speed * delta;
         if (this.moveDown) {
-            if (this.vy <= 8) this.vy += this.ay;
-            this.y += this.vy;
+            if (this.vy <= 8) this.vy += this.ay * delta;
+            this.y += this.vy * delta;
         }
 
         // Now we do our collision detection
@@ -128,6 +132,7 @@ export class PlayableCharacter {
         // Invisible Floor
         if (this.y + this.radius > canvas.height - 20) {
             this.y = canvas.height - 20 - this.radius;
+            this.jumpCount = 0;
             this.vy = 0;
         }
 
@@ -142,11 +147,24 @@ export class PlayableCharacter {
                         hero.y = platform.y + platform.height + hero.radius;
                     } 
                     else hero.y = platform.y - hero.radius;
+                    if (hero.vy > 0) hero.jumpCount = 0;
                     hero.vy = 0;
                 }
             }
         })
         if (!stopFall) this.moveDown = true;
+    }
+
+    /**
+     * Draw the hero's gun
+     * @param {CanvasRenderingContext2D} context 
+     */
+    drawGun(context) {
+        context.save();
+        context.fillStyle = "black";
+        context.scale(this.lastDirection, 1);
+        context.fillRect(0, 0, 20, 5);
+        context.restore();
     }
 
     /**
@@ -156,13 +174,15 @@ export class PlayableCharacter {
     draw(context) {
         // Then draw
         context.save();
-        context.translate(this.x, this.y);
-        context.fillStyle = "blue";
-        context.moveTo(0, 0);
-        context?.beginPath();
-        context.arc(0, 0, this.radius, 0, Math.PI * 2);
-        context?.closePath();
-        context.fill();
+            context.translate(this.x, this.y);
+            if (this.lastDirection == -1) this.drawGun(context);
+            context.fillStyle = "blue";
+            context.moveTo(0, 0);
+            context?.beginPath();
+            context.arc(0, 0, this.radius, 0, Math.PI * 2);
+            context?.closePath();
+            context.fill();
+            if (this.lastDirection == 1) this.drawGun(context);
         context.restore();
     }
 
