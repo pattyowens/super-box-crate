@@ -56,7 +56,7 @@ export class PlayableCharacter {
             if (this.weapon.timeDown == 0) bullets.push(new Bullet(this.x, this.y, 10 * this.lastDirection, this.vy));
             if (this.weapon.timeDown > (1 / this.weapon.fireRate)) {
                 this.weapon.timeDown = 0;
-                bullets.push(new Bullet(this.x, this.y, 10 * this.lastDirection, this.vy / 2));
+                bullets.push(new Bullet(this.x, this.y, 15 * this.lastDirection, this.vy / 2));
             }
             this.weapon.timeDown += delta;
         }

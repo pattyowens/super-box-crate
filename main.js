@@ -7,6 +7,7 @@ import { Crate } from "./crates.js";
 import { PlayableCharacter } from "./playableCharacter.js";
 import { TitleScreen } from "./titleScreen.js";
 import { Enemy } from "./enemies.js";
+import { Bullet } from "./weapons.js";
 
 
 /**
@@ -238,6 +239,23 @@ function spawnCrate() {
     }
 }
 
+// Spawn another enemy if under maximum for level
+function spawnEnemy() {
+    if (timeSinceLastSpawn > (3 - (score - enemies.length) * 0.5)) {
+        timeSinceLastSpawn = 0;
+        if (enemies.length < score + 1) {
+            let speed = 4 + Math.floor(score * Math.random() / 3);
+            let size = speed * 2;
+            if (size > 20) size = 20;
+            let modifier = (speed - 4) * 30;
+            if (modifier > 255) modifier = 255;
+            let red = 255 - modifier;
+            let green = modifier;
+            let color = "rgb(" + red + ", " + green + ", 0)";
+            enemies.push(new Enemy(speed, size, color));
+        }
+    }
+}
 
 let hero = /** @type {PlayableCharacter} */ new PlayableCharacter();
 let title = /** @type {TitleScreen} */ new TitleScreen();
@@ -250,15 +268,6 @@ let score = 0;
 let highestScore = 0;
 let timeSinceLastSpawn = 0;
 
-// Spawn another enemy if under maximum for level
-function spawnEnemy() {
-    if (timeSinceLastSpawn > (3 - (score - enemies.length) * 0.5)) {
-        timeSinceLastSpawn = 0;
-        if (enemies.length < score + 1) {
-            enemies.push(new Enemy());
-        }
-    }
-}
 
 /**
  * Where we run the game
