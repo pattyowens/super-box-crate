@@ -79,7 +79,7 @@ export class PlayableCharacter {
                     break;
                 case 'KeyW': // Move up
                     this.jumpCount++;
-                    if (this.jumpCount>2) break;
+                    if (this.jumpCount > 1) break;
                     this.vy = -12;
                     this.moveDown = true;
                     break;
@@ -109,7 +109,7 @@ export class PlayableCharacter {
         if (this.moveLeft) this.x -= this.speed * delta;
         if (this.moveRight) this.x += this.speed * delta;
         if (this.moveDown) {
-            if (this.vy <= 8) this.vy += this.ay;
+            if (this.vy <= 8) this.vy += this.ay * delta;
             this.y += this.vy * delta;
         }
 
