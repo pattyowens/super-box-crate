@@ -26,12 +26,14 @@ export class Enemy {
      * Update the enemy's position 
      * @param {HTMLCanvasElement} canvas 
      * @param {[Platform]} platforms 
+     * @param {number} delta
      */
-    update(canvas, platforms) {
+    update(canvas, platforms, delta) {
         let stopFall = false;
-        this.x += this.speed * this.direction;
+        let hardwareMod = delta * 50;
+        this.x += this.speed * this.direction * hardwareMod;
         if (this.moveDown) {
-            if (this.vy <= 8) this.vy += this.ay;
+            if (this.vy <= 8) this.vy += this.ay * hardwareMod;
             this.y += this.vy;
         }
 
@@ -46,11 +48,6 @@ export class Enemy {
             this.switchDirection();
             this.x = canvas.width - 20 - this.radius;
         }
-        // // Invisible Ceiling
-        // if (this.y - this.radius < 20) {
-        //     this.y = 20 + this.radius;
-        //     this.vy = 0;
-        // }
         // Invisible Floor
         if (this.y - this.radius > canvas.height) {
             this.y = 0 - this.radius;

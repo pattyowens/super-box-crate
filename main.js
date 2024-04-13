@@ -74,6 +74,9 @@ function drawCrates() {
     })
 }
 
+/**
+ * Draw the Score & Session hi-score
+ */
 function drawScore() {
     context?.save();
     context?.translate(30, 50);
@@ -88,7 +91,7 @@ function drawScore() {
     context?.restore()
 }
 
-// Debugging board
+// Debugging grid
 function drawBoard() {
     context?.save();
     let p = 0;
@@ -106,12 +109,18 @@ function drawBoard() {
     context?.restore();
 }
 
+/**
+ * Wrapper to render each bullet
+ */
 function drawBullets() {
     bullets.forEach(function (bullet) {
         bullet.draw(context);
     })
 }
 
+/**
+ * Wrapper to render each enemy
+ */
 function drawEnemies() {
     enemies.forEach(function (enemy) {
         enemy.draw(context);
@@ -131,6 +140,9 @@ function drawAll() {
     hero.draw(context);
 }
 
+/**
+ * Detect if a crate has been collected by the player
+ */
 function collectCrate() {
     for (let i = crates.length - 1; i >= 0; i--) {
         if (hero.x + hero.radius > crates[i].x && hero.x - hero.radius < crates[i].x + crates[i].length && hero.y + hero.radius > crates[i].y && hero.y - hero.radius < crates[i].y + crates[i].length) {
@@ -141,6 +153,9 @@ function collectCrate() {
     }
 }
 
+/**
+ * Handle the collision of bullets with the platforms, wall, ceilings, and enemies
+ */
 function bulletCollision() {
     for (let i = bullets.length - 1; i >= 0; i--) {
         // Left wall
@@ -201,6 +216,10 @@ function clearObjectArray(array) {
     if (array.length > 0) array.splice(0);
 }
 
+/**
+ * Handle the different elemenets required for ending the current game and 
+ * returning to the title to start a new one 
+ */
 function endGame() {
     if (score > highestScore) highestScore = score;
     score = 0;
@@ -224,7 +243,7 @@ let score = 0;
 let highestScore = 0;
 
 /**
- * Where we render the game
+ * Where we run the game
  * @param {number} timestamp 
  */
 function loop(timestamp) {
@@ -251,7 +270,7 @@ function loop(timestamp) {
             })
             collectCrate();
             enemies.forEach(function (enemy) {
-                enemy.update(canvas, platforms);
+                enemy.update(canvas, platforms, delta);
             })
             hero.fireGun(delta, bullets);
             bullets.forEach(function (bullet) {
