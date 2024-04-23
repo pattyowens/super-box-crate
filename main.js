@@ -36,6 +36,7 @@ let platforms = /** @type {[Platform]} */ [];
 plat_points.forEach(function (p) {
     platforms.push(new Platform(p[0], p[1], p[2], p[3]));
 })
+
 // Define Map Walls
 let wall_points = [
     [0.00 * width, 0.00 * height, 20, height],   // Left wall
@@ -282,7 +283,6 @@ function loop(timestamp) {
     timeSinceLastSpawn += delta;
 
     context?.clearRect(0, 0, width, height);
-    //console.log(hero.jumpCount);
 
     if (!runGame && !title.visible) runGame = true;
     if (runGame) {
